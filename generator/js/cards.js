@@ -120,7 +120,8 @@ function card_element_inline_icon(params, card_data, options) {
 function card_element_picture(params, card_data, options) {
     var url = params[0] || "";
     var height = params[1] || "";
-    return '<div class="card-element card-picture" style ="background-image: url(&quot;' + url + '&quot;); background-size: contain; background-position: center;background-repeat: no-repeat; height:' + height + 'px"></div>';
+    var borderradius = params[2] || "";
+    return '<div class="card-element card-picture" style ="background-image: url(&quot;' + url + '&quot;); background-size: contain; background-position: center; background-repeat: no-repeat; height:' + height + 'px"></div>';
 }
 
 function card_element_ruler(params, card_data, options) {
@@ -140,11 +141,14 @@ function card_element_boxes(params, card_data, options) {
     var fill = ' fill="none"';
     var stroke = ' stroke="' + color + '"';
     var count = params[0] || 1;
-    var size = params[1] || 3;
+    var size = params[1] || 1;
+    var label = params[2];
     var style = 'style="width:' + size + 'em;height:' + size + 'em"';
 
     var result = "";
     result += '<div class="card-element card-description-line">';
+    if(label)
+        result += '   <h4 class="card-property-name">' + label + ' </h4><br>';
     for (var i = 0; i < count; ++i) {
         result += '<svg class="card-box" height="100" width="100" viewbox="0 0 100 100" preserveaspectratio="none" xmlns="http://www.w3.org/2000/svg" ' + style + '>';
         result += '    <rect x="5" y="5" width="90" height="90" ' + fill + stroke + ' style="stroke-width:10">';
@@ -182,7 +186,7 @@ function card_element_description(params, card_data, options) {
 function card_element_text(params, card_data, options) {
     var result = "";
     result += '<div class="card-element card-description-line">';
-    result += '   <p class="card-p card-description-text">' + params[0] + '</p>';
+    result += '   <p class="card-p card-description-text" style="font-size: ' + params[1] + 'px">' + params[0] + '</p>';
     result += '</div>';
     return result;
 }
@@ -190,7 +194,15 @@ function card_element_text(params, card_data, options) {
 function card_element_center(params, card_data, options) {
     var result = "";
     result += '<div class="card-element card-description-line" style="text-align: center">';
-    result += '   <p class="card-p card-description-text">' + params[0] + '</p>';
+    result += '   <p class="card-p card-description-text" style="font-size: ' + params[1] + 'px">' + params[0] + '</p>';
+    result += '</div>';
+    return result;
+}
+
+function card_element_quote(params, card_data, options) {
+    var result = "";
+    result += '<div class="card-element card-description-line" style="text-align: center">';
+    result += '   <p class="card-p card-description-text" style="font-size: ' + params[1] + 'px; font-style: italic">"' + params[0] + '"</p>';
     result += '</div>';
     return result;
 }
@@ -198,42 +210,65 @@ function card_element_center(params, card_data, options) {
 function card_element_justify(params, card_data, options) {
     var result = "";
     result += '<div class="card-element card-description-line" style="text-align: justify; hyphens: auto">';
-    result += '   <p class="card-p card-description-text">' + params[0] + '</p>';
+    result += '   <p class="card-p card-description-text" style="font-size: ' + params[1] + 'px">' + params[0] + '</p>';
     result += '</div>';
     return result;
 }
 
 function card_element_dndstats(params, card_data, options) {
-    var stats = [10, 10, 10, 10, 10, 10];
-    var mods = [0,0,0,0,0,0];
+    var stats = [];
+    var mods = [];
     for (var i = 0; i < 6; ++i) {
-        stats[i] = parseInt(params[i], 10) || 0;
-        var mod = Math.floor(((stats[i] - 10) / 2));
-        if (mod >= 0) {
-            mod = "+" + mod;
-        } else {
-            mod = "" + mod;
+        stats.push(parseInt(params[i], 10) || null);
+        if(stats[i] !== null) {
+            var mod = Math.floor(((stats[i] - 10) / 2));
+            if (mod >= 0) {
+                mod = "+" + mod;
+            } else {
+                mod = "" + mod;
+            }
+            mods.push("&nbsp;(" + mod + ")");
         }
-        mods[i] = "&nbsp;(" + mod + ")";
+        else {
+            mods.push(null);
+        }
     }
 
     var result = "";
     result += '<table class="card-stats">';
     result += '    <tbody><tr>';
-    result += '      <th class="card-stats-header">STR</th>';
-    result += '      <th class="card-stats-header">DEX</th>';
-    result += '      <th class="card-stats-header">CON</th>';
-    result += '      <th class="card-stats-header">INT</th>';
-    result += '      <th class="card-stats-header">WIS</th>';
-    result += '      <th class="card-stats-header">CHA</th>';
+        result += '      <th class="card-stats-header">STR</th>';
+        result += '      <th class="card-stats-header">DEX</th>';
+        result += '      <th class="card-stats-header">CON</th>';
+        result += '      <th class="card-stats-header">INT</th>';
+        result += '      <th class="card-stats-header">WIS</th>';
+        result += '      <th class="card-stats-header">CHA</th>';
     result += '    </tr>';
     result += '    <tr>';
-    result += '      <td class="card-stats-cell">' + stats[0] + mods[0] + '</td>';
-    result += '      <td class="card-stats-cell">' + stats[1] + mods[1] + '</td>';
-    result += '      <td class="card-stats-cell">' + stats[2] + mods[2] + '</td>';
-    result += '      <td class="card-stats-cell">' + stats[3] + mods[3] + '</td>';
-    result += '      <td class="card-stats-cell">' + stats[4] + mods[4] + '</td>';
-    result += '      <td class="card-stats-cell">' + stats[5] + mods[5] + '</td>';
+    if(stats[0])
+        result += '      <td class="card-stats-cell">' + stats[0] + mods[0] + '</td>';
+    else
+        result += '      <td class="card-stats-cell">-</td>';
+    if(stats[1])
+        result += '      <td class="card-stats-cell">' + stats[1] + mods[1] + '</td>';
+    else
+        result += '      <td class="card-stats-cell">-</td>';
+    if(stats[2])
+        result += '      <td class="card-stats-cell">' + stats[2] + mods[2] + '</td>';
+    else
+        result += '      <td class="card-stats-cell">-</td>';
+    if(stats[3])
+        result += '      <td class="card-stats-cell">' + stats[3] + mods[3] + '</td>';
+    else
+        result += '      <td class="card-stats-cell">-</td>';
+    if(stats[4])
+        result += '      <td class="card-stats-cell">' + stats[4] + mods[4] + '</td>';
+    else
+        result += '      <td class="card-stats-cell">-</td>';
+    if(stats[5])
+        result += '      <td class="card-stats-cell">' + stats[5] + mods[5] + '</td>';
+    else
+        result += '      <td class="card-stats-cell">-</td>';
     result += '    </tr>';
     result += '  </tbody>';
     result += '</table>';
@@ -283,7 +318,8 @@ var card_element_generators = {
     section: card_element_section,
     disabled: card_element_empty,
     picture: card_element_picture,
-    icon: card_element_inline_icon
+    icon: card_element_inline_icon,
+    quote: card_element_quote
 };
 
 // ============================================================================
