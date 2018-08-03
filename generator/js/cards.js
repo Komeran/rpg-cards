@@ -278,7 +278,7 @@ function card_element_dndstats(params, card_data, options) {
 function card_element_bullet(params, card_data, options) {
     var result = "";
     result += '<ul class="card-element card-bullet-line">';
-    result += '   <li class="card-bullet">' + params[0] + '</li>';
+    result += '   <li class="card-bullet">' + (params[1] ? ('<span style="font-weight: bold; ">' + params[0] + ' </span>' + params[1]) : params[0]) + '</li>';
     result += '</ul>';
     return result;
 }
